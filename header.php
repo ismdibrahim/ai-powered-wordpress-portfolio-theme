@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php wp_head(); ?>
 </head>
-<body <?php body_class(); ?>>
+<body id="site-top" <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 <a class="screen-reader-text" href="#main-content"><?php esc_html_e( 'Skip to content', 'devcanvas' ); ?></a>
-<header id="site-top" class="site-header">
+<header class="site-header">
     <div class="header-inner">
         <?php devcanvas_logo(); ?>
         <nav class="desktop-navigation" aria-label="<?php esc_attr_e( 'Main navigation', 'devcanvas' ); ?>">

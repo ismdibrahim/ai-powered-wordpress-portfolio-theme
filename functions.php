@@ -4,6 +4,8 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 require_once get_theme_file_path( '/inc/homepage-settings.php' );
+require_once get_theme_file_path( '/inc/projects.php' );
+require_once get_theme_file_path( '/inc/projects-page-settings.php' );
 
 function devcanvas_setup() {
     register_nav_menus( array( 'primary' => __( 'Header Menu', 'devcanvas' ) ) );
@@ -15,7 +17,11 @@ function devcanvas_setup() {
 add_action( 'after_setup_theme', 'devcanvas_setup' );
 
 function devcanvas_enqueue_styles() {
-    if ( is_page_template( 'template-homepage.php' ) ) {
+    if ( is_page_template( 'templates/template-homepage.php' ) ) {
+        wp_enqueue_script( 'devcanvas-contact', get_theme_file_uri( '/assets/contact.js' ), array(), (string) filemtime( get_theme_file_path( '/assets/contact.js' ) ), true );
+    }
+    if ( is_page_template( array( 'templates/template-homepage.php', 'templates/template-projects.php' ) ) ) {
+        wp_enqueue_script( 'devcanvas-project-filters', get_theme_file_uri( '/assets/projects.js' ), array(), (string) filemtime( get_theme_file_path( '/assets/projects.js' ) ), true );
         wp_enqueue_style( 'devcanvas-homepage', get_theme_file_uri( '/assets/homepage.css' ), array( 'devcanvas-style' ), (string) filemtime( get_theme_file_path( '/assets/homepage.css' ) ) );
     }
     wp_enqueue_style( 'devcanvas-fonts', 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap', array(), null );

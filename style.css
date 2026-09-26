@@ -25,7 +25,7 @@ html { scroll-behavior: smooth; scroll-padding-top: 120px; }
 body { background: #f7f6f2; color: #252720; font-family: 'DM Sans', sans-serif; -webkit-font-smoothing: antialiased; }
 a { color: inherit; }
 a:hover { color: #cc552d; }
-:focus-visible { outline: 2px solid #cc552d; outline-offset: 5px; }
+:focus-visible { outline: 2px solid #cc552d; outline-offset: 0px; }
 .site-header, .site-footer { width: 100%; padding: 0; }
 .site-header { position: sticky; top: 0; z-index: 50; background: #f7f6f2; border-bottom: 1px solid #2527201a; box-shadow: 0 2px 12px #25272006; }
 .header-inner { max-width: 1280px; min-height: 96px; margin: auto; padding: 0 48px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }

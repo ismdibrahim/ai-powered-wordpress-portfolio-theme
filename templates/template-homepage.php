@@ -54,30 +54,34 @@ $data = devcanvas_homepage_data( get_queried_object_id() );
             <?php if ( $data['services_description'] ) : ?><p class="dc-services-description"><?php echo nl2br( esc_html( $data['services_description'] ) ); ?></p><?php endif; ?>
         </div>
         <div class="dc-services-grid">
-            <?php for ( $i = 0; $i < 3; $i++ ) : $prefix = 'service_' . $i . '_'; ?>
-                <?php if ( '1' !== $data[ $prefix . 'show' ] ) { continue; } ?>
+            <?php foreach ( devcanvas_service_rows( get_queried_object_id() ) as $service ) : ?>
+                <?php if ( '1' !== $service[ 'show' ] ) { continue; } ?>
                 <article class="dc-service-card">
                     <div class="dc-service-icon" aria-hidden="true">
-                        <?php if ( $data[ $prefix . 'icon' ] ) : ?>
-                            <img src="<?php echo esc_url( $data[ $prefix . 'icon' ] ); ?>" alt="" width="28" height="28" loading="lazy">
-                        <?php elseif ( $data[ $prefix . 'symbol' ] ) : ?>
-                            <?php echo esc_html( $data[ $prefix . 'symbol' ] ); ?>
-                        <?php elseif ( 1 === $i ) : ?>
+                        <?php if ( $service[ 'icon' ] ) : ?>
+                            <img src="<?php echo esc_url( $service[ 'icon' ] ); ?>" alt="" width="28" height="28" loading="lazy">
+                        <?php elseif ( $service[ 'symbol' ] ) : ?>
+                            <?php echo esc_html( $service[ 'symbol' ] ); ?>
+                        <?php elseif ( 'cart' === $service['fallback'] ) : ?>
                             <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4h2l3 12h11l2-9H6M9 20h.01M18 20h.01" stroke-linecap="round"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
                         <?php else : ?>
-                            <?php echo 0 === $i ? 'W' : '↗'; ?>
+                            <?php echo 'wordpress' === $service['fallback'] ? 'W' : '↗'; ?>
                         <?php endif; ?>
                     </div>
-                    <?php if ( $data[ $prefix . 'number' ] ) : ?><span class="dc-service-number"><?php echo esc_html( $data[ $prefix . 'number' ] ); ?></span><?php endif; ?>
-                    <?php if ( $data[ $prefix . 'title' ] ) : ?><h3><?php echo esc_html( $data[ $prefix . 'title' ] ); ?></h3><?php endif; ?>
-                    <?php if ( $data[ $prefix . 'description' ] ) : ?><p><?php echo nl2br( esc_html( $data[ $prefix . 'description' ] ) ); ?></p><?php endif; ?>
-                    <?php $tags = array_filter( array_map( 'trim', explode( "\n", $data[ $prefix . 'tags' ] ) ), 'strlen' ); ?>
+                    <?php if ( $service[ 'number' ] ) : ?><span class="dc-service-number"><?php echo esc_html( $service[ 'number' ] ); ?></span><?php endif; ?>
+                    <?php if ( $service[ 'title' ] ) : ?><h3><?php echo esc_html( $service[ 'title' ] ); ?></h3><?php endif; ?>
+                    <?php if ( $service[ 'description' ] ) : ?><p><?php echo nl2br( esc_html( $service[ 'description' ] ) ); ?></p><?php endif; ?>
+                    <?php $tags = array_filter( array_map( 'trim', explode( "\n", $service[ 'tags' ] ) ), 'strlen' ); ?>
                     <?php if ( $tags ) : ?><ul class="dc-service-tags"><?php foreach ( $tags as $tag ) : ?><li><?php echo esc_html( $tag ); ?></li><?php endforeach; ?></ul><?php endif; ?>
                 </article>
-            <?php endfor; ?>
+            <?php endforeach; ?>
         </div>
     </section>
     <?php endif; ?>
+    <?php get_template_part( 'inc/homepage-projects' ); ?>
+    <?php get_template_part( 'inc/homepage-about' ); ?>
+    <?php get_template_part( 'inc/homepage-contact' ); ?>
 </main>
 <?php get_footer(); ?>
+
 

@@ -1,6 +1,7 @@
 <?php
 /** Homepage page settings, stored separately for each page. */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
+require_once __DIR__ . '/services-repeater.php';
 
 function devcanvas_homepage_fields() {
     $fields = array(
@@ -62,6 +63,38 @@ function devcanvas_homepage_fields() {
         $fields[ $prefix . 'symbol' ] = array( 'Icon text or symbol (blank uses default icon)', 'text', $service[3], $group );
         $fields[ $prefix . 'tags' ] = array( 'Tags (one per line)', 'textarea', $service[2], $group );
     }
+    $fields['projects_show'] = array( 'Show projects section', 'checkbox', '1', 'Projects overview' );
+    $fields['projects_eyebrow'] = array( 'Section label', 'text', '02 / SELECTED WORK', 'Projects overview' );
+    $fields['projects_heading'] = array( 'Section heading', 'text', 'A few things I’ve built.', 'Projects overview' );
+    $fields['projects_all_label'] = array( 'All categories filter label', 'text', 'All work', 'Projects overview' );
+    $fields['projects_empty'] = array( 'Empty state text', 'text', 'No projects to show yet.', 'Projects overview' );
+    $fields['projects_note'] = array( 'Text below the projects', 'textarea', 'A glimpse of what’s possible. These projects showcase my approach to design and development.', 'Projects footer' );
+    $fields['projects_button_text'] = array( 'Button text', 'text', 'View all projects', 'Projects footer' );
+    $fields['projects_button_url'] = array( 'Button URL (leave blank to hide)', 'url', '', 'Projects footer' );
+    $fields['about_show'] = array( 'Show About section', 'checkbox', '1', 'About introduction' );
+    $fields['about_eyebrow'] = array( 'Section label', 'text', '03 / THE PERSON BEHIND THE PIXELS', 'About introduction' );
+    $fields['about_heading'] = array( 'Heading (one line per row)', 'textarea', "Your developer.\nYour creative partner.", 'About introduction' );
+    $fields['about_intro'] = array( 'First paragraph', 'textarea', 'Hi again, I’m Alex — an independent developer with a soft spot for clean design and websites that just work.', 'About introduction' );
+    $fields['about_description'] = array( 'Second paragraph', 'textarea', 'I work with small businesses, creatives, and ambitious people to build their little corner of the internet. You bring the vision. I bring the curiosity, the code, and a very hands-on approach.', 'About introduction' );
+    $fields['about_points'] = array( 'Highlights (one per line)', 'textarea', "Clear communication\nCare in every detail", 'About links' );
+    $fields['about_link_text'] = array( 'Link text', 'text', 'Let’s make something good together', 'About links' );
+    $fields['about_link_url'] = array( 'Link URL', 'url', '#contact', 'About links' );
+    $fields['about_code_name'] = array( 'Name in the code card', 'text', 'Alex', 'About artwork' );
+    $fields['about_code_power'] = array( 'Powered by', 'text', 'coffee', 'About artwork' );
+    $fields['about_code_values'] = array( 'Cares about (one per line)', 'textarea', "the little details\nyour big picture", 'About artwork' );
+    $fields['about_sticker'] = array( 'Sticker text (one line per row)', 'textarea', "A real human.\nWho loves the web.", 'About artwork' );
+    $fields['contact_show'] = array( 'Show Contact section', 'checkbox', '1', 'Contact introduction' );
+    $fields['contact_eyebrow'] = array( 'Section label', 'text', '04 / YOUR NEXT CHAPTER', 'Contact introduction' );
+    $fields['contact_heading'] = array( 'Heading (one line per row)', 'textarea', "Have something\ngood in mind", 'Contact introduction' );
+    $fields['contact_accent'] = array( 'Orange ending text', 'text', '?', 'Contact introduction' );
+    $fields['contact_description'] = array( 'Description', 'textarea', 'A new website, a better store, or an idea on a napkin. I’d love to hear about it.', 'Contact introduction' );
+    $fields['contact_email'] = array( 'Email address', 'text', 'hello@example.com', 'Contact details' );
+    $fields['contact_copy_label'] = array( 'Copy email button label', 'text', 'Copy email', 'Contact details' );
+    $fields['contact_availability'] = array( 'Availability text', 'text', 'Open for new collaborations', 'Contact details' );
+    $fields['contact_form_heading'] = array( 'Form panel heading', 'text', 'Let’s talk about your project.', 'Contact form' );
+    $fields['contact_form_intro'] = array( 'Form panel introduction (optional)', 'textarea', '', 'Contact form' );
+    $fields['contact_shortcode'] = array( 'Form shortcode — paste JetFormBuilder, Contact Form 7, or another form shortcode', 'textarea', '', 'Contact form' );
+    $fields['contact_form_note'] = array( 'Note below the form (optional)', 'textarea', '', 'Contact form' );
     return $fields;
 }
 
@@ -92,6 +125,14 @@ function devcanvas_homepage_metabox( $post ) {
         'Floating labels' => array( 'Hero', 'Floating Badges' ),
         'Toolkit' => array( 'Toolkit', 'Visibility & Introduction' ),
         'Services overview' => array( 'Services', 'Visibility & Introduction' ),
+        'Projects overview' => array( 'Projects', 'Visibility, Heading & Filters' ),
+        'Projects footer' => array( 'Projects', 'Supporting Text & Button' ),
+        'About introduction' => array( 'About', 'Visibility & Introduction' ),
+        'About links' => array( 'About', 'Highlights & Link' ),
+        'About artwork' => array( 'About', 'Code Card & Sticker' ),
+        'Contact introduction' => array( 'Contact', 'Visibility & Introduction' ),
+        'Contact details' => array( 'Contact', 'Email & Availability' ),
+        'Contact form' => array( 'Contact', 'Form Shortcode & Text' ),
     );
     for ( $i = 1; $i <= 5; $i++ ) {
         $groups[ 'Toolkit item ' . $i ] = array( 'Toolkit', 'Tool ' . $i . ' — Logo & Link' );
@@ -100,14 +141,19 @@ function devcanvas_homepage_metabox( $post ) {
         $groups[ 'Service card ' . $i ] = array( 'Services', 'Service ' . $i . ' — Content, Icon & Tags' );
     }
     foreach ( devcanvas_homepage_fields() as $key => $field ) {
+        if ( 0 === strpos( $key, 'service_' ) ) { continue; }
         if ( $group !== $field[3] ) {
             if ( $group ) { echo '</div></details>'; }
             $group = $field[3];
             $group_info = $groups[ $group ];
             if ( $section !== $group_info[0] ) {
+                if ( 'Services' === $section ) { devcanvas_services_repeater( $post->ID ); }
                 if ( $section ) { echo '</div></details>'; }
                 $section = $group_info[0];
-                $descriptions = array( 'Hero' => 'Manage your introduction, calls to action, and artwork.', 'Toolkit' => 'Manage the toolkit strip and individual tool logos.', 'Services' => 'Manage the section introduction and three service cards.' );
+                $descriptions = array( 'Hero' => 'Manage your introduction, calls to action, and artwork.', 'Toolkit' => 'Manage the toolkit strip and individual tool logos.', 'Services' => 'Manage the introduction and add, remove, or reorder service cards.' );
+                $descriptions['Projects'] = 'Displays the latest four published projects. Edit cards and categories in the Projects dashboard menu.';
+                $descriptions['About'] = 'Manage your biography, highlights, decorative code card, and contact link.';
+                $descriptions['Contact'] = 'Edit the contact section and paste the shortcode from your form plugin. Configure fields and delivery in that plugin.';
                 $description = $descriptions[ $section ];
                 echo '<details class="dc-settings-section"><summary><span class="dc-section-title">' . esc_html( $section ) . '</span><span class="dc-section-description">' . esc_html( $description ) . '</span></summary><div class="dc-section-body">';
             }
@@ -130,7 +176,9 @@ function devcanvas_homepage_metabox( $post ) {
         }
         echo '</p>';
     }
-    echo '</div></details></div></details>';
+    echo '</div></details>';
+    if ( 'Services' === $section ) { devcanvas_services_repeater( $post->ID ); }
+    echo '</div></details>';
 }
 
 add_action( 'save_post_page', function ( $post_id ) {
@@ -146,12 +194,20 @@ add_action( 'save_post_page', function ( $post_id ) {
         elseif ( 'textarea' === $field[1] ) { $clean[ $key ] = sanitize_textarea_field( $value ); }
         else { $clean[ $key ] = sanitize_text_field( $value ); }
     }
+    // Preserve legacy card values for older pages until repeatable rows are saved.
+    foreach ( devcanvas_homepage_data( $post_id ) as $key => $value ) {
+        if ( 0 === strpos( $key, 'service_' ) ) { $clean[ $key ] = $value; }
+    }
     update_post_meta( $post_id, '_devcanvas_homepage', $clean );
+    if ( isset( $_POST['devcanvas_services_present'] ) ) {
+        $rows = isset( $_POST['devcanvas_services'] ) && is_array( $_POST['devcanvas_services'] ) ? wp_unslash( $_POST['devcanvas_services'] ) : array();
+        update_post_meta( $post_id, '_devcanvas_services', devcanvas_sanitize_service_rows( $rows ) );
+    }
 } );
 
 add_action( 'admin_enqueue_scripts', function ( $hook ) {
     if ( ! in_array( $hook, array( 'post.php', 'post-new.php' ), true ) || 'page' !== get_current_screen()->post_type ) { return; }
     wp_enqueue_media();
-    wp_enqueue_script( 'devcanvas-homepage-admin', get_theme_file_uri( '/assets/homepage-admin.js' ), array( 'jquery', 'wp-data' ), '1.0', true );
+    wp_enqueue_script( 'devcanvas-homepage-admin', get_theme_file_uri( '/assets/homepage-admin.js' ), array( 'jquery', 'wp-data' ), (string) filemtime( get_theme_file_path( '/assets/homepage-admin.js' ) ), true );
     wp_enqueue_style( 'devcanvas-homepage-admin', get_theme_file_uri( '/assets/homepage-admin.css' ), array(), (string) filemtime( get_theme_file_path( '/assets/homepage-admin.css' ) ) );
 } );
